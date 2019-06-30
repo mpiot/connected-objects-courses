@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <title>Framboise connecter</title>
+    <link rel="stylesheet" href="style.css?v=1">
+</head>
+<body id="body">
+<div class="container">
+    <div class="top">
+        <div class="onoffswitch">
+            <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="checkbox" checked>
+            <label class="onoffswitch-label" for="checkbox">
+                <span class="onoffswitch-inner"></span>
+                <span class="onoffswitch-switch"></span>
+            </label>
+        </div>
+    </div>
+    <div class="bot">
+        <i class="led far fa-lightbulb"></i>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    let body = $('#body');
+    let value;
+    let name;
+
+    // Switch
+
+    // Led
+    let led = $('.led');
+    let check = $('#checkbox');
+    // Watcher
+    let interval = 300;
+
+    function apiWatch() {
+        setInterval(() => {
+            axios.get('http://195.83.128.55/~mmi16f13/raspberry/index.php?action=read').then((response) => {
+                console.log(response.data);
+                let data = response.data;
+                if (data.switch) {
+                    led.removeClass('far').addClass('fas is-active');
+                } else {
+                    led.removeClass('fas').addClass('far').addClass('is-active');
+                }
+
+                if (data.led) {
+                    console.log('active');
+                    check.prop('checked', true);
+                    check.addClass('is-active');
+                    body.addClass('active');
+                    console.log('check')
+                } else {
+                    console.log('false');
+                    check.prop('checked', false);
+                    check.removeClass('is-active');
+                    body.removeClass('active');
+                    console.log('uncheck')
+                }
+            })
+        }, interval);
+    }
+
+    $(document).ready(function() {
+        apiWatch();
+        check.click(() => {
+            if(check.is(':checked')) {
+                axios.get('http://195.83.128.55/~mmi16f13/raspberry/index.php?action=write&name=led&value=1').then((response) => {
+                    console.log(response.data);
+                })
+            } else {
+                axios.get('http://195.83.128.55/~mmi16f13/raspberry/index.php?action=write&name=led&value=0').then((response) => {
+                    console.log(response.data);
+                })
+            }
+        });
+    });
+
+
+    // $('.hamburger').on("click", function () {
+    //     $(this).toggleClass('is-active');
+    //     $('.header-menu__principal__main-menu').toggleClass('is-active');
+    //     $(this).toggleClass('noscroll');
+    //     $('.page-template-default').toggleClass('noscroll');
+    // });
+</script>
+</body>
+</html>
